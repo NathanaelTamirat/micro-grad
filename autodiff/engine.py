@@ -19,8 +19,8 @@ class Value:
         other=other if isinstance(other,Value) else Value(other)  
         out=Value(self.data+other.data,(self,other),"+")
         def _backward():
-            self.grad+=1.0+out.grad
-            other.grad+=1.0+out.grad
+            self.grad+=out.grad
+            other.grad+=out.grad
         out._backward=_backward
         return out 
     def backward(self):
@@ -46,12 +46,13 @@ class Value:
             self.grad=(1-t**2)*out.grad
         out._backward=_backward
         return out 
+    
     def relu(self):
-        out=Value(0 if self.data <0 else self.data,(self,),"ReLU")
+        out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
         def _backward():
-            self.grad+=(out.data>0) * out.grad
-        out._backward=_backward
-        return out  
+            self.grad += (out.data > 0) * out.grad
+        out._backward = _backward
+        return out
     def exp(self):
         x=self.data
         out=Value(math.exp(x),(self,),"exp")
